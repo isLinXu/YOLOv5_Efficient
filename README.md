@@ -19,12 +19,19 @@ The repository is reconstructed and annotated based on UltralyTICS / YOLOV5, and
 |  ![](https://img2020.cnblogs.com/blog/1571518/202111/1571518-20211105110409690-1455179243.png)     |      ![](https://img2020.cnblogs.com/blog/1571518/202111/1571518-20211105110418858-940040936.png)           |
 |![](https://img2020.cnblogs.com/blog/1571518/202111/1571518-20211105110426763-812179903.png) |![](https://img2020.cnblogs.com/blog/1571518/202111/1571518-20211105110435881-328445319.png)      |
 
+**demo video**
+
+<iframe src="//player.bilibili.com/player.html?aid=336331236&bvid=BV1zR4y177sa&cid=432234631&page=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
 
 
 ### 2.2 Yolo center point line 中心点连线
 | demo1                                                        | demo2                                                        |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | ![](https://img2020.cnblogs.com/blog/1571518/202111/1571518-20211105110651730-834327083.png) | ![](https://img2020.cnblogs.com/blog/1571518/202111/1571518-20211105110705075-1370353606.png) |
+
+### 2.3 autolabel半自动标注
+
+<iframe src="//player.bilibili.com/player.html?aid=933566990&bvid=BV1ET4y1o7ZR&cid=425923550&page=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
 
 
 
@@ -59,13 +66,13 @@ python yolov5_master/main.py
 单独使用-测试图片
 
 ```shell
-python detect.py --source ./testfiles/img1.jpg --weights runs/train/bmyolov5s/weights/best.pt 
+python yolov5_master/detect.py --source ./testfiles/img1.jpg --weights runs/train/bmyolov5s/weights/best.pt 
 ```
 
 单独使用-测试视频
 
 ```shell
-python detect.py --source ./testfiles/video.mp4 --weights runs/train/bmyolov5s/weights/best.pt 
+python yolov5_master/detect.py --source ./testfiles/video.mp4 --weights runs/train/bmyolov5s/weights/best.pt 
 ```
 
 集成使用
