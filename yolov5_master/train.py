@@ -26,6 +26,8 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.optim import Adam, SGD, lr_scheduler
 from tqdm import tqdm
 
+from yolov5_master.main import PackageProjectUtil
+
 FILE = Path(__file__).resolve()
 sys.path.append(FILE.parents[0].as_posix())  # add yolov5/ to path
 
@@ -55,6 +57,9 @@ LOGGER = logging.getLogger(__name__)
 LOCAL_RANK = int(os.getenv('LOCAL_RANK', -1))  # https://pytorch.org/docs/stable/elastic/run.html
 RANK = int(os.getenv('RANK', -1))
 WORLD_SIZE = int(os.getenv('WORLD_SIZE', 1))
+
+# 将当前项目目录添加至Python编译器路径(兼容python命令行运行方式)
+sys.path.append(PackageProjectUtil.project_root_path())
 
 '''
 训练主体

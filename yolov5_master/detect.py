@@ -13,6 +13,8 @@ import cv2
 import torch
 import torch.backends.cudnn as cudnn
 
+from yolov5_master.main import PackageProjectUtil
+
 FILE = Path(__file__).absolute()
 sys.path.append(FILE.parents[0].as_posix())  # add yolov5/ to path
 
@@ -22,6 +24,9 @@ from yolov5_master.utils.general import check_img_size, check_requirements, chec
     apply_classifier, scale_coords, xyxy2xywh, strip_optimizer, set_logging, increment_path, save_one_box
 from yolov5_master.utils.plots import colors, plot_one_box
 from yolov5_master.utils.torch_utils import select_device, load_classifier, time_sync
+
+# 将当前项目目录添加至Python编译器路径(兼容python命令行运行方式)
+sys.path.append(PackageProjectUtil.project_root_path())
 
 @torch.no_grad()
 def run(
