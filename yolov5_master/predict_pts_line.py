@@ -81,22 +81,7 @@ def detector(frame, model, device, conf_threshold=0.4,half=True):
 
                 idxs = info[4]
 
-                print('idx:', idxs)
-                print('boxes:', boxes)
-                print(info)
-
-                images = GrabCut.runGrabCut(imgcut, boxes, idxs)
-                if len(images) > 0:
-                    for i in range(len(images)):
-                        image = images[i]
-                        cv2.imshow("grabcut", image)
-                        cv2.waitKey(0)
-                        # cv2.imwrite("grabcut{}.jpg".format(i), images[i])
-                else:
-                    plot_one_box(xyxy, frame, label=label, color=colors(c, True), line_thickness=line_thickness)
-                    cv2.imshow('frame', frame)
-                    cv2.waitKey()
-
+                # 绘制中心点连线
                 for i in range(0,len(points_list)):
                     pt1 = points_list[i]
                     if i == len(points_list)-1:
@@ -127,15 +112,10 @@ if __name__ == '__main__':
     start_log()
     # 参数设置
     # weights = 'yolov5s.pt'
-    weights = '/home/hxzh02/MyGithub/TrainNetHub/YOLO/yolov5_master/weights/yolov5s.pt'
-    # weights = '/home/hxzh02/MyGithub/TrainNetHub/YOLO/yolov5_master/runs/train/bm-yolov5s4/weights/best.pt'
+    weights = '/home/hxzh02/MyGithub/TrainNetHub/YOLO/yolov5_master/runs/train/bm-yolov5s4/weights/best.pt'
     # 设置图片路径
-    imgdir = '/home/hxzh02/文档/coco128/images/train2017/'
-    # imgdir = '/home/hxzh02/下载/archive (1)/Dataset/train/cars'
-    # imgdir = '/media/hxzh02/SB@home/hxzh/Dataset/无人机杆塔航拍数据集/杆塔主体/Image'
-    # imgdir = '/media/hxzh02/SB@home/hxzh/Dataset/无人机杆塔航拍数据集/杆塔主体/Image/383.jpg'
+    imgdir = '/media/hxzh02/SB@home/hxzh/Dataset/无人机杆塔航拍数据集/杆塔主体/VOCdevkit_tower_part/JPEGImages/'
     # 输出xml标注文件
-    # outdir = '/home/hxzh02/文档/coco128/annations'
     outdir = '/media/hxzh02/SB@home/hxzh/Dataset/无人机杆塔航拍数据集/杆塔主体/annotaions/'
 
     if (os.path.exists(imgdir)):

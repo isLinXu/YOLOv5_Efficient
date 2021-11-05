@@ -10,15 +10,14 @@ import os
 from os import getcwd
 from xml.etree import ElementTree as ET
 # from lxml import etree as ET
-from YOLO.yolov5_master.detect import detect_parse_opt
-from YOLO.yolov5_master.models.experimental import attempt_load
-from YOLO.yolov5_master.predict import predict
-from YOLO.yolov5_master.utils import *
-from YOLO.yolov5_master.utils import torch_utils
-from YOLO.yolov5_master.utils.datasets import *
-from YOLO.yolov5_master.utils.general import non_max_suppression, scale_coords, xyxy2xywh
-from YOLO.yolov5_master.utils.plots import plot_one_box, colors, plot_one_box_circle
-from YOLO.yolov5_master.utils.torch_utils import load_classifier
+from yolov5_master.detect import detect_parse_opt
+from yolov5_master.models.experimental import attempt_load
+from yolov5_master.utils import *
+from yolov5_master.utils import torch_utils
+from yolov5_master.utils.datasets import *
+from yolov5_master.utils.general import non_max_suppression, scale_coords, xyxy2xywh
+from yolov5_master.utils.plots import plot_one_box, colors, plot_one_box_circle
+from yolov5_master.utils.torch_utils import load_classifier
 
 
 def detector(frame, model, device, conf_threshold=0.4,half=True):
@@ -191,14 +190,11 @@ def pretty_xml(element, indent, newline, level=0):  # ，参数indent用于缩�
 if __name__ == '__main__':
     start_log()
     # 参数设置
-    # weights = 'yolov5s.pt'
-    weights = '/home/hxzh02/MyGithub/TrainNetHub/YOLO/yolov5_master/runs/train/bm-yolov5s4/weights/best.pt'
+    weights = 'yolov5s.pt'
     # 设置图片路径
-    # imgdir = '/home/hxzh02/文档/coco128/images/train2017'
-    imgdir = '/media/hxzh02/SB@home/hxzh/Dataset/无人机杆塔航拍数据集/杆塔主体/Image'
+    imgdir = '/home/hxzh02/文档/coco128/images/train2017'
     # 输出xml标注文件
-    # outdir = '/home/hxzh02/文档/coco128/annations'
-    outdir = '/media/hxzh02/SB@home/hxzh/Dataset/无人机杆塔航拍数据集/杆塔主体/annotaions/'
+    outdir = '/home/hxzh02/文档/coco128/annations'
 
     if (os.path.exists(imgdir)):
         # 选择设备类型

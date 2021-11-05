@@ -251,7 +251,7 @@ We are super excited about our first-ever Ultralytics YOLOv5 🚀 EXPORT Competi
 ## <div align="center">Contribute</div>
 
 We love your input! We want to make contributing to YOLOv5 as easy and transparent as possible. Please see
-our [Contributing Guide](support/CONTRIBUTING.md) to get started.
+our [Contributing Guide](CONTRIBUTING.md) to get started.
 
 ## <div align="center">Contact</div>
 

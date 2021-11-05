@@ -120,7 +120,7 @@ def attempt_load(weights, map_location=None, inplace=True):
     """加载pt文件
     weights可以是权重路径，也可以是一个保存多个权重路径的列表
     """
-    from YOLO.yolov5_master.models.yolo import Detect, Model
+    from yolov5_master.models.yolo import Detect, Model
 
     # Loads an ensemble of models weights=[a,b,c] or a single model weights=[a] or weights=a
     # 初始化一个融合模型列表

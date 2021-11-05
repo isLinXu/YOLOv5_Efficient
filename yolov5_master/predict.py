@@ -6,12 +6,11 @@ from pathlib import Path
 import cv2
 import torch
 from numpy import random
-from YOLO.yolov5_master.utils.general import (check_img_size, non_max_suppression, scale_coords, xyxy2xywh)
-from YOLO.yolov5_master.utils.plots import plot_one_box
-from YOLO.yolov5_master.utils.torch_utils import time_synchronized
-from YOLO.yolov5_master.utils.datasets import LoadStreams, LoadImages
-from YOLO.yolov5_master.utils.torch_utils import select_device
-# from backend.flask_id2name import id2name
+from yolov5_master.utils.general import (check_img_size, non_max_suppression, scale_coords, xyxy2xywh)
+from yolov5_master.utils.plots import plot_one_box
+from yolov5_master.utils.torch_utils import time_synchronized
+from yolov5_master.utils.datasets import LoadStreams, LoadImages
+from yolov5_master.utils.torch_utils import select_device
 
 id2name = {0: 'person',
  1: 'bicycle',
