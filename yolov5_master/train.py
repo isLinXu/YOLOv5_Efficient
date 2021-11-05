@@ -29,23 +29,23 @@ from tqdm import tqdm
 FILE = Path(__file__).resolve()
 sys.path.append(FILE.parents[0].as_posix())  # add yolov5/ to path
 
-import YOLO.yolov5_master.val as val # for end-of-epoch mAP
-from YOLO.yolov5_master.models.experimental import attempt_load
-from YOLO.yolov5_master.models.yolo import Model
-from YOLO.yolov5_master.utils.autoanchor import check_anchors
-from YOLO.yolov5_master.utils.datasets import create_dataloader
-from YOLO.yolov5_master.utils.general import labels_to_class_weights, increment_path, labels_to_image_weights, init_seeds, \
+import yolov5_master.val as val # for end-of-epoch mAP
+from yolov5_master.models.experimental import attempt_load
+from yolov5_master.models.yolo import Model
+from yolov5_master.utils.autoanchor import check_anchors
+from yolov5_master.utils.datasets import create_dataloader
+from yolov5_master.utils.general import labels_to_class_weights, increment_path, labels_to_image_weights, init_seeds, \
     strip_optimizer, get_latest_run, check_dataset, check_git_status, check_img_size, check_requirements, \
     check_file, check_yaml, check_suffix, print_mutation, set_logging, one_cycle, colorstr, methods
-from YOLO.yolov5_master.utils.downloads import attempt_download
-from YOLO.yolov5_master.utils.loss import ComputeLoss
-from YOLO.yolov5_master.utils.plots import plot_labels, plot_evolve
-from YOLO.yolov5_master.utils.torch_utils import EarlyStopping, ModelEMA, de_parallel, intersect_dicts, select_device, \
+from yolov5_master.utils.downloads import attempt_download
+from yolov5_master.utils.loss import ComputeLoss
+from yolov5_master.utils.plots import plot_labels, plot_evolve
+from yolov5_master.utils.torch_utils import EarlyStopping, ModelEMA, de_parallel, intersect_dicts, select_device, \
     torch_distributed_zero_first
-from YOLO.yolov5_master.utils.loggers.wandb.wandb_utils import check_wandb_resume
-from YOLO.yolov5_master.utils.metrics import fitness
-from YOLO.yolov5_master.utils.loggers import Loggers
-from YOLO.yolov5_master.utils.callbacks import Callbacks
+from yolov5_master.utils.loggers.wandb.wandb_utils import check_wandb_resume
+from yolov5_master.utils.metrics import fitness
+from yolov5_master.utils.loggers import Loggers
+from yolov5_master.utils.callbacks import Callbacks
 
 # 获取日志的一个实例，其中__name__（当前模块的派生名称-->train）为日志记录的用例名
 LOGGER = logging.getLogger(__name__)

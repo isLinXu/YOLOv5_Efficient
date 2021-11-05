@@ -20,15 +20,15 @@ from tqdm import tqdm
 FILE = Path(__file__).resolve()
 sys.path.append(FILE.parents[0].as_posix())  # add yolov5/ to path
 
-from YOLO.yolov5_master.models.experimental import attempt_load
-from YOLO.yolov5_master.utils.datasets import create_dataloader
-from YOLO.yolov5_master.utils.general import coco80_to_coco91_class, check_dataset, check_img_size, check_requirements, \
+from yolov5_master.models.experimental import attempt_load
+from yolov5_master.utils.datasets import create_dataloader
+from yolov5_master.utils.general import coco80_to_coco91_class, check_dataset, check_img_size, check_requirements, \
     check_suffix, check_yaml, box_iou, non_max_suppression, scale_coords, xyxy2xywh, xywh2xyxy, set_logging, \
     increment_path, colorstr
-from YOLO.yolov5_master.utils.metrics import ap_per_class, ConfusionMatrix
-from YOLO.yolov5_master.utils.plots import plot_images, output_to_target, plot_study_txt
-from YOLO.yolov5_master.utils.torch_utils import select_device, time_sync
-from YOLO.yolov5_master.utils.callbacks import Callbacks
+from yolov5_master.utils.metrics import ap_per_class, ConfusionMatrix
+from yolov5_master.utils.plots import plot_images, output_to_target, plot_study_txt
+from yolov5_master.utils.torch_utils import select_device, time_sync
+from yolov5_master.utils.callbacks import Callbacks
 
 
 def save_one_txt(predn, save_conf, shape, file):

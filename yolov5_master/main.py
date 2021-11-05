@@ -2,7 +2,7 @@
 import cv2
 import sys
 import os
-os.environ['CUDA_VISIBLE_DEVICES']='0'
+
 class PackageProjectUtil:
     @staticmethod
     def project_root_path(project_name=None, print_log=True):
@@ -12,7 +12,7 @@ class PackageProjectUtil:
         :param print_log: 是否打印日志信息
         :return: 指定项目的根路径
         """
-        p_name = 'TrainNetHub' if project_name is None else project_name
+        p_name = 'Yolov5_Efficient' if project_name is None else project_name
         project_path = os.path.abspath(os.path.dirname(__file__))
         # Windows
         if project_path.find('\\') != -1: separator = '\\'
@@ -25,13 +25,12 @@ class PackageProjectUtil:
 
 # 将当前项目目录添加至Python编译器路径(兼容python命令行运行方式)
 sys.path.append(PackageProjectUtil.project_root_path())
+
 # 当前目录
 rpath = sys.path[0]
 
-
-
-from YOLO.yolov5_master.train import train_main,train_parse_opt
-from YOLO.yolov5_master.detect import detect_main,detect_parse_opt
+from yolov5_master.train import train_main,train_parse_opt
+from yolov5_master.detect import detect_main,detect_parse_opt
 
 def train_(object_name):
     # 初始化参数列表
@@ -79,7 +78,7 @@ def detect_(object_name):
     # 置信度设置
     d_opt.conf_thres = 0.5
     # 边界框线条粗细
-    d_opt.line_thickness = 1
+    d_opt.line_thickness = 4
     cv2.waitKey()
     """开始预测推理"""
     detect_main(d_opt)

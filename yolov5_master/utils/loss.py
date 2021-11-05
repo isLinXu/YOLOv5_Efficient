@@ -5,8 +5,8 @@ Loss functions
 import torch
 import torch.nn as nn
 
-from YOLO.yolov5_master.utils.metrics import bbox_iou
-from YOLO.yolov5_master.utils.torch_utils import is_parallel
+from yolov5_master.utils.metrics import bbox_iou
+from yolov5_master.utils.torch_utils import is_parallel
 
 
 def smooth_BCE(eps=0.1):  # https://github.com/ultralytics/yolov3/issues/238#issuecomment-598028441

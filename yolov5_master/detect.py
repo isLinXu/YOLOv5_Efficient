@@ -16,12 +16,12 @@ import torch.backends.cudnn as cudnn
 FILE = Path(__file__).absolute()
 sys.path.append(FILE.parents[0].as_posix())  # add yolov5/ to path
 
-from YOLO.yolov5_master.models.experimental import attempt_load
-from YOLO.yolov5_master.utils.datasets import LoadStreams, LoadImages
-from YOLO.yolov5_master.utils.general import check_img_size, check_requirements, check_imshow, colorstr, non_max_suppression, \
+from yolov5_master.models.experimental import attempt_load
+from yolov5_master.utils.datasets import LoadStreams, LoadImages
+from yolov5_master.utils.general import check_img_size, check_requirements, check_imshow, colorstr, non_max_suppression, \
     apply_classifier, scale_coords, xyxy2xywh, strip_optimizer, set_logging, increment_path, save_one_box
-from YOLO.yolov5_master.utils.plots import colors, plot_one_box
-from YOLO.yolov5_master.utils.torch_utils import select_device, load_classifier, time_sync
+from yolov5_master.utils.plots import colors, plot_one_box
+from yolov5_master.utils.torch_utils import select_device, load_classifier, time_sync
 
 @torch.no_grad()
 def run(

@@ -14,10 +14,10 @@ import torch.nn as nn
 from PIL import Image
 from torch.cuda import amp
 
-from YOLO.yolov5_master.utils.datasets import exif_transpose, letterbox
-from YOLO.yolov5_master.utils.general import non_max_suppression, make_divisible, scale_coords, increment_path, xyxy2xywh, save_one_box,is_ascii,colorstr
-from YOLO.yolov5_master.utils.plots import colors, plot_one_box,Annotator
-from YOLO.yolov5_master.utils.torch_utils import time_sync
+from yolov5_master.utils.datasets import exif_transpose, letterbox
+from yolov5_master.utils.general import non_max_suppression, make_divisible, scale_coords, increment_path, xyxy2xywh, save_one_box,is_ascii,colorstr
+from yolov5_master.utils.plots import colors, plot_one_box,Annotator
+from yolov5_master.utils.torch_utils import time_sync
 
 LOGGER = logging.getLogger(__name__)
 

@@ -12,12 +12,12 @@ from pathlib import Path
 FILE = Path(__file__).resolve()
 sys.path.append(FILE.parents[1].as_posix())  # add yolov5/ to path
 
-from YOLO.yolov5_master.models.common import *
-from YOLO.yolov5_master.models.experimental import *
-from YOLO.yolov5_master.utils.autoanchor import check_anchor_order
-from YOLO.yolov5_master.utils.general import check_yaml, make_divisible, set_logging
-from YOLO.yolov5_master.utils.plots import feature_visualization
-from YOLO.yolov5_master.utils.torch_utils import copy_attr, fuse_conv_and_bn, initialize_weights, model_info, scale_img, \
+from yolov5_master.models.common import *
+from yolov5_master.models.experimental import *
+from yolov5_master.utils.autoanchor import check_anchor_order
+from yolov5_master.utils.general import check_yaml, make_divisible, set_logging
+from yolov5_master.utils.plots import feature_visualization
+from yolov5_master.utils.torch_utils import copy_attr, fuse_conv_and_bn, initialize_weights, model_info, scale_img, \
     select_device, time_sync
 
 try:
