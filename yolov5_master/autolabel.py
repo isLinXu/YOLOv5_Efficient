@@ -1,3 +1,4 @@
+# -*- coding:utf-8  -*-
 '''
 @author: linxu
 @contact: 17746071609@163.com
@@ -12,13 +13,19 @@ from xml.etree import ElementTree as ET
 # from lxml import etree as ET
 from yolov5_master.detect import detect_parse_opt
 from yolov5_master.models.experimental import attempt_load
-from yolov5_master.utils import *
 from yolov5_master.utils import torch_utils
 from yolov5_master.utils.datasets import *
 from yolov5_master.utils.general import non_max_suppression, scale_coords, xyxy2xywh
 from yolov5_master.utils.plots import plot_one_box, colors, plot_one_box_circle
 from yolov5_master.utils.torch_utils import load_classifier
 
+
+def mk(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+        print("make dirs in %s" % (path))
+    else:
+        print("There are %d files in %s" % (len(os.listdir(path)), path))
 
 def detector(frame, model, device, conf_threshold=0.4,half=True):
     '''
@@ -249,11 +256,24 @@ if __name__ == '__main__':
                     tree = ET.ElementTree(annotation)
                     root = tree.getroot()
                     pretty_xml(root, '\t', '\n')
-                    # tree.write('./{}/{}.xml'.format(outdir, image_name.strip('.jpg')), encoding='utf-8')
-                    tree.write('{}/{}.xml'.format(outdir, image_name.strip('.jpg')), encoding='utf-8')
+
+                    # 设置去除文件后缀名，避免与.xml冲突
+                    image_name = image_name.strip('.JPG')
+                    image_name = image_name.strip('.jpg')
+
+                    # Windows
+                    if outdir.find('\\') != -1:
+                        print('image_name', image_name)
+                        tree.write('{}\{}.xml'.format(outdir, image_name), encoding='utf-8')
+                    # Mac、Linux、Unix
+                    if outdir.find('/') != -1:
+                        print('image_name', image_name)
+                        tree.write('{}/{}.xml'.format(outdir, image_name), encoding='utf-8')
+
                 else:
                     print(image_name)
     else:
         print('imgdir not exist!')
+
 
 

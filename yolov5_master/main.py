@@ -1,3 +1,10 @@
+# -*- coding:utf-8  -*-
+'''
+@author: linxu
+@contact: 17746071609@163.com
+@time: 2021-8-16 上午09:56
+@desc: 模型执行-主函数
+'''
 
 import cv2
 import sys
