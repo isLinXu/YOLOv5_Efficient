@@ -127,7 +127,7 @@ if __name__ == '__main__':
     start_log()
     # 参数设置
     # weights = 'yolov5s.pt'
-    weights = '/home/hxzh02/MyGithub/TrainNetHub/YOLO/yolov5_master/weights/yolov5s.pt'
+    weights = '/media/hxzh02/SB@home/hxzh/MyGithub/Yolov5_Efficient/yolov5_master/weights/yolov5s.pt'
     # weights = '/home/hxzh02/MyGithub/TrainNetHub/YOLO/yolov5_master/runs/train/bm-yolov5s4/weights/best.pt'
     # 设置图片路径
     imgdir = '/home/hxzh02/文档/coco128/images/train2017/'
@@ -185,17 +185,6 @@ if __name__ == '__main__':
                         # print(label_id)
                         # print(names[label_id])
 
-        # image = cv2.imread(os.path.join(imgdir, imgdir))
-        # # 进行检测并将预测信息存入list
-        # conf_threshold = 0.4
-        # coordinates_list = detector(image, model, device, conf_threshold, half)
-        # # print(coordinates_list)
-        # if coordinates_list:
-        #     print(imgdir)
-        #     for coordinate in coordinates_list:
-        #         label_id = coordinate[4]
-        #         print(label_id)
-        #         # print(names[label_id])
 
     else:
         print('imgdir not exist!')
