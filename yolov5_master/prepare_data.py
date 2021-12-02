@@ -1,3 +1,10 @@
+# -*- coding:utf-8  -*-
+'''
+@author: linxu
+@contact: 17746071609@163.com
+@time: 2021-11-24 上午012:56
+@desc: 模型执行-主函数
+'''
 import xml.etree.ElementTree as ET
 import pickle
 import os
@@ -5,11 +12,22 @@ from os import listdir, getcwd
 from os.path import join
 import random
 from shutil import copyfile
+from tqdm import tqdm
 
 # 分类类别
 # classes = ["nest", "trash", "kite", "balloon"] # 异物分类
-classes = ["insulator", "defect"]              # 绝缘子分类
-# classes = ['smoke']                           # 烟雾检测
+# classes = ["insulator", "defect"]              # 绝缘子分类
+# classes = ['smoke']                            # 烟雾检测
+# classes = ["head", "person", "helmet"]         # 安全帽检测
+# classes = ['fire', 'smoke']                    # 烟火检测
+# classes = ['tower_body','tower_head','tower_foot','tower_body_down'] # 杆塔检测
+
+# 电塔巡检检测
+classes = ['tower_body','tower_head','tower_foot','tower_body_down',
+           'insulator', 'defect',
+           'line','line_break','line_extract',
+           'nest', 'trash', 'kite', 'balloon',
+           ]
 
 # 划分训练集比率
 TRAIN_RATIO = 90
@@ -64,10 +82,8 @@ def convert_annotation(dir_path, dataset_name, image_id):
     w = int(size.find('width').text)
     h = int(size.find('height').text)
 
-
     for obj in root.iter('object'):
         cls = obj.find('name').text
-        print(cls)
         classlist.append(cls)
         if len(classes) > 1:
             difficult = obj.find('difficult').text
@@ -78,12 +94,15 @@ def convert_annotation(dir_path, dataset_name, image_id):
         xmlbox = obj.find('bndbox')
         b = (float(xmlbox.find('xmin').text), float(xmlbox.find('xmax').text), float(xmlbox.find('ymin').text),
              float(xmlbox.find('ymax').text))
-        bb = convert((w, h), b)
-        out_file.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
+
+        # 避免由于w或h为0造成的convert带来的错误
+        if w != 0 and h!= 0:
+            bb = convert((w, h), b)
+            out_file.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
 
     # 整理object类别列表
     classdd = list(set(classlist))
-    print('classlist', classdd)
+    # print('classlist', classdd)
     in_file.close()
     out_file.close()
 
@@ -142,8 +161,9 @@ def trans_prepare_config(dir_path='data/', dataset_name='VOCdevkit_xxx'):
     test_file = open(os.path.join(dir_path + "yolov5_val.txt"), 'a')
     list_imgs = os.listdir(image_dir)  # list image files
     prob = random.randint(1, 100)
-    print("Probability: %d" % prob)
-    for i in range(0, len(list_imgs)):
+
+    # for i in range(0, len(list_imgs)):
+    for i in tqdm(range(0, len(list_imgs))):
         path = os.path.join(image_dir, list_imgs[i])
         if os.path.isfile(path):
             image_path = image_dir + list_imgs[i]
@@ -162,6 +182,7 @@ def trans_prepare_config(dir_path='data/', dataset_name='VOCdevkit_xxx'):
             if os.path.exists(annotation_path):
                 train_file.write(image_path + '\n')
                 # 转换label
+                # print('nameWithoutExtention',nameWithoutExtention)
                 convert_annotation(dir_path=dir_path, dataset_name=dataset_name, image_id=nameWithoutExtention)
                 copyfile(image_path, yolov5_images_train_dir + voc_path)
                 copyfile(label_path, yolov5_labels_train_dir + label_name)
@@ -173,13 +194,19 @@ def trans_prepare_config(dir_path='data/', dataset_name='VOCdevkit_xxx'):
                 convert_annotation(dir_path=dir_path, dataset_name=dataset_name, image_id=nameWithoutExtention)
                 copyfile(image_path, yolov5_images_test_dir + voc_path)
                 copyfile(label_path, yolov5_labels_test_dir + label_name)
+
+    print('classlist', classlist)
     train_file.close()
     test_file.close()
 
 
 if __name__ == '__main__':
     # 设置数据集根目录路径
-    dir_path = '/media/hxzh02/SB@home/hxzh/Dataset/无人机相关数据集合集/7-输电线路绝缘子数据集VOC/'
+    # dir_path = '/media/hxzh02/SB@home/hxzh/Dataset/无人机相关数据集合集/7-输电线路绝缘子数据集VOC/'
+    # dir_path = '/media/hxzh02/SB@home/hxzh/Dataset/无人机相关数据集合集/5-安全帽数据集5000张/'
+    dir_path = '/media/hxzh02/SB@home/hxzh/Dataset/无人机相关数据集合集/'
     # 设置数据集名称
-    dataset_name = 'dataset_insulator'
+    # dataset_name = 'dataset_insulator'
+    # dataset_name = 'dataset_safetyHat'
+    dataset_name = 'dataset_plane_all'
     trans_prepare_config(dir_path, dataset_name)
