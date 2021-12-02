@@ -3,8 +3,9 @@
 @author: linxu
 @contact: 17746071609@163.com
 @time: 2021-11-24 上午012:56
-@desc: 模型执行-主函数
+@desc: 数据集处理
 '''
+
 import xml.etree.ElementTree as ET
 import pickle
 import os
@@ -23,14 +24,15 @@ from tqdm import tqdm
 # classes = ['tower_body','tower_head','tower_foot','tower_body_down'] # 杆塔检测
 
 # 电塔巡检检测
-classes = ['tower_body','tower_head','tower_foot','tower_body_down',
+classes = ['tower_body', 'tower_head', 'tower_foot', 'tower_body_down',
            'insulator', 'defect',
-           'line','line_break','line_extract',
+           'line', 'line_break', 'line_extract',
            'nest', 'trash', 'kite', 'balloon',
            ]
 
 # 划分训练集比率
 TRAIN_RATIO = 90
+
 
 def clear_hidden_files(path):
     '''
@@ -67,7 +69,10 @@ def convert(size, box):
     h = h * dh
     return (x, y, w, h)
 
+
 classlist = []
+
+
 def convert_annotation(dir_path, dataset_name, image_id):
     '''
     转换annotation
@@ -96,7 +101,7 @@ def convert_annotation(dir_path, dataset_name, image_id):
              float(xmlbox.find('ymax').text))
 
         # 避免由于w或h为0造成的convert带来的错误
-        if w != 0 and h!= 0:
+        if w != 0 and h != 0:
             bb = convert((w, h), b)
             out_file.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
 
