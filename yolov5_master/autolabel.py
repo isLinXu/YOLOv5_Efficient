@@ -27,7 +27,7 @@ def mk(path):
     else:
         print("There are %d files in %s" % (len(os.listdir(path)), path))
 
-def detector(frame, model, device, conf_threshold=0.4,half=True, debug = True):
+def detector(frame, model, device, names,conf_threshold=0.4,half=True, debug = True):
     '''
     检测函数主体
     :param frame: 图像
@@ -39,49 +39,51 @@ def detector(frame, model, device, conf_threshold=0.4,half=True, debug = True):
     '''
     img_size = 640
     img0 = frame
-    img = letterbox(img0, new_shape=img_size)[0]
 
-    img = img[:, :, :].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
-    img = np.ascontiguousarray(img)
-    img = torch.from_numpy(img).to(device)
-    img = img.half() if half else img.float()
-    img /= 255.0
-    if img.ndimension() == 3:
-        img = img.unsqueeze(0)
+    if img0 is not None:
+        img = letterbox(img0, new_shape=img_size)[0]
 
-    hide_labels = False
-    hide_conf = False
-    line_thickness = 4
+        img = img[:, :, :].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
+        img = np.ascontiguousarray(img)
+        img = torch.from_numpy(img).to(device)
+        img = img.half() if half else img.float()
+        img /= 255.0
+        if img.ndimension() == 3:
+            img = img.unsqueeze(0)
 
-    with torch.no_grad():
-        # 前向推理
-        # pred = model(img, augment=opt['augment'])[0]
-        pred = model(img)[0]
-        pred = non_max_suppression(pred, conf_thres=conf_threshold, iou_thres=0.1)
-        for i, det in enumerate(pred):
-            if det is not None and len(det):
-                # Rescale boxes from img_size to im0 size
-                # 调整预测框的坐标：基于resize+pad的图片的坐标-->基于原size图片的坐标
-                # 此时坐标格式为xyxy
-                det[:, :4] = scale_coords(img.shape[2:], det[:, :4], img0.shape).round()
-                info_list = []
-                # 保存预测结果
-                for *xyxy, conf, cls in det:
-                    xyxy = torch.tensor(xyxy).view(-1).tolist()
-                    info = [xyxy[0], xyxy[1], xyxy[2], xyxy[3], int(cls)]
+        hide_labels = False
+        hide_conf = False
+        line_thickness = 4
 
-                    c = int(cls)  # integer class
-                    label = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
-                    if debug:
-                        # 画框预览效果
-                        plot_one_box(xyxy, frame, label=label, color=colors(c, True), line_thickness=line_thickness)
-                        cv2.imshow('frame',frame)
-                        cv2.waitKey(0)
+        with torch.no_grad():
+            # 前向推理
+            # pred = model(img, augment=opt['augment'])[0]
+            pred = model(img)[0]
+            pred = non_max_suppression(pred, conf_thres=conf_threshold, iou_thres=0.1)
+            for i, det in enumerate(pred):
+                if det is not None and len(det):
+                    # Rescale boxes from img_size to im0 size
+                    # 调整预测框的坐标：基于resize+pad的图片的坐标-->基于原size图片的坐标
+                    # 此时坐标格式为xyxy
+                    det[:, :4] = scale_coords(img.shape[2:], det[:, :4], img0.shape).round()
+                    info_list = []
+                    # 保存预测结果
+                    for *xyxy, conf, cls in det:
+                        xyxy = torch.tensor(xyxy).view(-1).tolist()
+                        info = [xyxy[0], xyxy[1], xyxy[2], xyxy[3], int(cls)]
 
-                    info_list.append(info)
-                return info_list
-            else:
-                return None
+                        c = int(cls)  # integer class
+                        label = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
+                        if debug:
+                            # 画框预览效果
+                            plot_one_box(xyxy, frame, label=label, color=colors(c, True), line_thickness=line_thickness)
+                            cv2.imshow('frame',frame)
+                            cv2.waitKey(0)
+
+                        info_list.append(info)
+                    return info_list
+                else:
+                    return None
 
 
 def create_object(root, xi, yi, xa, ya, obj_name):
@@ -241,40 +243,41 @@ def auto_label_main(weights, imgdir, outdir):
                 image = cv2.imread(os.path.join(imgdir, image_name))
                 # 进行检测并将预测信息存入list
                 conf_threshold = 0.4
-                coordinates_list = detector(image, model, device,conf_threshold,half,False)
+                coordinates_list = detector(image, model, device,names,conf_threshold,half,False)
 
-                (h, w) = image.shape[:2]
-                create_tree(image_name, h, w, imgdir)
-                if coordinates_list:
-                    print(image_name)
-                    for coordinate in coordinates_list:
-                        label_id = coordinate[4]
-                        create_object(annotation, int(coordinate[0]), int(coordinate[1]), int(coordinate[2]),
-                                      int(coordinate[3]), names[label_id])
+                if image is not None:
+                    (h, w) = image.shape[:2]
+                    create_tree(image_name, h, w, imgdir)
+                    if coordinates_list:
+                        print(image_name)
+                        for coordinate in coordinates_list:
+                            label_id = coordinate[4]
+                            create_object(annotation, int(coordinate[0]), int(coordinate[1]), int(coordinate[2]),
+                                          int(coordinate[3]), names[label_id])
 
-                    # 将树模型写入xml文件
-                    tree = ET.ElementTree(annotation)
-                    root = tree.getroot()
-                    pretty_xml(root, '\t', '\n')
+                        # 将树模型写入xml文件
+                        tree = ET.ElementTree(annotation)
+                        root = tree.getroot()
+                        pretty_xml(root, '\t', '\n')
 
-                    # 设置去除文件后缀名，避免与.xml冲突
-                    # image_name = image_name.strip('.JPG')
-                    # image_name = image_name.strip('.jpg')
-                    # print('pp',image_name)
+                        # 设置去除文件后缀名，避免与.xml冲突
+                        s_name = image_name.split('.')
+                        # print('s_name', s_name)
+                        image_name = s_name[0]
 
-                    # Windows
-                    if outdir.find('\\') != -1:
-                        print('image_name', image_name)
-                        tree.write('{}\{}.xml'.format(outdir, image_name), encoding='utf-8')
-                    # Mac、Linux、Unix
-                    if outdir.find('/') != -1:
-                        print('image_name', image_name)
-                        tree.write('{}/{}.xml'.format(outdir, image_name), encoding='utf-8')
+                        # Windows
+                        if outdir.find('\\') != -1:
+                            print('image_name', image_name)
+                            tree.write('{}\{}.xml'.format(outdir, image_name), encoding='utf-8')
+                        # Mac、Linux、Unix
+                        if outdir.find('/') != -1:
+                            print('image_name', image_name)
+                            tree.write('{}/{}.xml'.format(outdir, image_name), encoding='utf-8')
 
-                else:
-                    print(image_name)
-    else:
-        print('imgdir not exist!')
+                    else:
+                        print(image_name)
+        else:
+            print('imgdir not exist!')
 
 
 
