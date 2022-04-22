@@ -11,7 +11,7 @@ import os
 from os import getcwd
 from xml.etree import ElementTree as ET
 # from lxml import etree as ET
-from yolov5_master.detect import detect_parse_opt
+# from yolov5_master.detect import detect_parse_opt
 from yolov5_master.models.experimental import attempt_load
 from yolov5_master.utils import torch_utils
 from yolov5_master.utils.datasets import *
@@ -27,7 +27,7 @@ def mk(path):
     else:
         print("There are %d files in %s" % (len(os.listdir(path)), path))
 
-def detector(frame, model, device, conf_threshold=0.4,half=True):
+def detector(frame, model, device, conf_threshold=0.4,half=True, debug = True):
     '''
     检测函数主体
     :param frame: 图像
@@ -72,11 +72,11 @@ def detector(frame, model, device, conf_threshold=0.4,half=True):
 
                     c = int(cls)  # integer class
                     label = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
-
-                    # 画框预览效果
-                    plot_one_box(xyxy, frame, label=label, color=colors(c, True), line_thickness=line_thickness)
-                    cv2.imshow('frame',frame)
-                    cv2.waitKey(0)
+                    if debug:
+                        # 画框预览效果
+                        plot_one_box(xyxy, frame, label=label, color=colors(c, True), line_thickness=line_thickness)
+                        cv2.imshow('frame',frame)
+                        cv2.waitKey(0)
 
                     info_list.append(info)
                 return info_list
@@ -194,15 +194,14 @@ def pretty_xml(element, indent, newline, level=0):  # ，参数indent用于缩�
         pretty_xml(subelement, indent, newline, level=level + 1)  # 对子元素进行递归操作
 
 
-if __name__ == '__main__':
-    start_log()
-    # 参数设置
-    weights = 'yolov5s.pt'
-    # 设置图片路径
-    imgdir = '/home/hxzh02/文档/coco128/images/train2017'
-    # 输出xml标注文件
-    outdir = '/home/hxzh02/文档/coco128/annations'
-
+def auto_label_main(weights, imgdir, outdir):
+    '''
+    自动标注主运行函数
+    :param weights:
+    :param imgdir:
+    :param outdir:
+    :return:
+    '''
     if (os.path.exists(imgdir)):
         # 选择设备类型
         device = torch_utils.select_device(device='0')
@@ -235,13 +234,14 @@ if __name__ == '__main__':
         IMAGES_LIST = os.listdir(imgdir)
 
         for image_name in IMAGES_LIST:
-            # print(image_name)
+            print(image_name)
+
             # 判断后缀只处理jpg文件
             if image_name.endswith('.jpg') or image_name.endswith('.JPG'):
                 image = cv2.imread(os.path.join(imgdir, image_name))
                 # 进行检测并将预测信息存入list
                 conf_threshold = 0.4
-                coordinates_list = detector(image, model, device,conf_threshold,half)
+                coordinates_list = detector(image, model, device,conf_threshold,half,False)
 
                 (h, w) = image.shape[:2]
                 create_tree(image_name, h, w, imgdir)
@@ -258,8 +258,9 @@ if __name__ == '__main__':
                     pretty_xml(root, '\t', '\n')
 
                     # 设置去除文件后缀名，避免与.xml冲突
-                    image_name = image_name.strip('.JPG')
-                    image_name = image_name.strip('.jpg')
+                    # image_name = image_name.strip('.JPG')
+                    # image_name = image_name.strip('.jpg')
+                    # print('pp',image_name)
 
                     # Windows
                     if outdir.find('\\') != -1:
@@ -274,6 +275,19 @@ if __name__ == '__main__':
                     print(image_name)
     else:
         print('imgdir not exist!')
+
+
+
+if __name__ == '__main__':
+    start_log()
+    # 参数设置
+    weights = '/media/hxzh02/SB@home/hxzh/MyGithub/Yolov5_Efficient/yolov5_master/weights/yolov5s.pt'
+    # 设置图片路径
+    imgdir = '/media/hxzh02/Double/数据集/images/'
+    # 输出xml标注文件
+    outdir = '/media/hxzh02/Double/数据集/xml'
+
+    auto_label_main(weights, imgdir, outdir)
 
 
 
