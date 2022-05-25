@@ -9,8 +9,9 @@ import os
 import cv2
 from yolov5_master.models.experimental import attempt_load
 from yolov5_master.utils import torch_utils, GrabCut
+from yolov5_master.utils.augmentations import letterbox
 from yolov5_master.utils.datasets import *
-from yolov5_master.utils.general import non_max_suppression, scale_coords, xyxy2xywh
+from yolov5_master.utils.general import non_max_suppression, scale_coords, xyxy2xywh, check_requirements
 from yolov5_master.utils.plots import plot_one_box, colors, plot_one_box_circle
 from yolov5_master.utils.torch_utils import load_classifier
 
@@ -112,11 +113,11 @@ if __name__ == '__main__':
     start_log()
     # 参数设置
     # weights = 'yolov5s.pt'
-    weights = '/home/hxzh02/MyGithub/TrainNetHub/YOLO/yolov5_master/runs/train/bm-yolov5s4/weights/best.pt'
+    weights = '/media/hxzh02/SB@home/hxzh/MyGithub/Yolov5_Efficient/yolov5_master/weights/yolov5s.pt'
     # 设置图片路径
-    imgdir = '/media/hxzh02/SB@home/hxzh/Dataset/无人机杆塔航拍数据集/杆塔主体/VOCdevkit_tower_part/JPEGImages/'
+    imgdir = '/media/hxzh02/SB@home/hxzh/MyGithub/Yolov5_Efficient/yolov5_master/data/images'
     # 输出xml标注文件
-    outdir = '/media/hxzh02/SB@home/hxzh/Dataset/无人机杆塔航拍数据集/杆塔主体/annotaions/'
+    outdir = '/media/hxzh02/SB@home/hxzh/MyGithub/Yolov5_Efficient/yolov5_master/dst'
 
     if (os.path.exists(imgdir)):
         # 选择设备类型

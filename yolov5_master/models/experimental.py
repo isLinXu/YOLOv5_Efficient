@@ -1,15 +1,15 @@
-# YOLOv5 experimental modules
+# YOLOv5 🚀 by Ultralytics, GPL-3.0 license
+"""
+Experimental modules
+"""
+import math
 
-"""
-YOLOv5 experimental modules
-实验模块
-"""
 import numpy as np
 import torch
 import torch.nn as nn
 
-from yolov5_master.models.common import Conv, DWConv
-from yolov5_master.utils.downloads import attempt_download
+from models.common import Conv
+from utils.downloads import attempt_download
 
 
 class CrossConv(nn.Module):
@@ -33,7 +33,7 @@ class Sum(nn.Module):
         self.weight = weight  # apply weights boolean
         self.iter = range(n - 1)  # iter object
         if weight:
-            self.w = nn.Parameter(-torch.arange(1., n) / 2, requires_grad=True)  # layer weights
+            self.w = nn.Parameter(-torch.arange(1.0, n) / 2, requires_grad=True)  # layer weights
 
     def forward(self, x):
         y = x[0]  # no weight
@@ -47,60 +47,32 @@ class Sum(nn.Module):
         return y
 
 
-class GhostConv(nn.Module):
-    # Ghost Convolution https://github.com/huawei-noah/ghostnet
-    def __init__(self, c1, c2, k=1, s=1, g=1, act=True):  # ch_in, ch_out, kernel, stride, groups
-        super().__init__()
-        c_ = c2 // 2  # hidden channels
-        self.cv1 = Conv(c1, c_, k, s, None, g, act)
-        self.cv2 = Conv(c_, c_, 5, 1, None, c_, act)
-
-    def forward(self, x):
-        y = self.cv1(x)
-        return torch.cat([y, self.cv2(y)], 1)
-
-
-class GhostBottleneck(nn.Module):
-    # Ghost Bottleneck https://github.com/huawei-noah/ghostnet
-    def __init__(self, c1, c2, k=3, s=1):  # ch_in, ch_out, kernel, stride
-        super().__init__()
-        c_ = c2 // 2
-        self.conv = nn.Sequential(GhostConv(c1, c_, 1, 1),  # pw
-                                  DWConv(c_, c_, k, s, act=False) if s == 2 else nn.Identity(),  # dw
-                                  GhostConv(c_, c2, 1, 1, act=False))  # pw-linear
-        self.shortcut = nn.Sequential(DWConv(c1, c1, k, s, act=False),
-                                      Conv(c1, c2, 1, 1, act=False)) if s == 2 else nn.Identity()
-
-    def forward(self, x):
-        return self.conv(x) + self.shortcut(x)
-
-
 class MixConv2d(nn.Module):
     # Mixed Depth-wise Conv https://arxiv.org/abs/1907.09595
-    def __init__(self, c1, c2, k=(1, 3), s=1, equal_ch=True):
+    def __init__(self, c1, c2, k=(1, 3), s=1, equal_ch=True):  # ch_in, ch_out, kernel, stride, ch_strategy
         super().__init__()
-        groups = len(k)
+        n = len(k)  # number of convolutions
         if equal_ch:  # equal c_ per group
-            i = torch.linspace(0, groups - 1E-6, c2).floor()  # c2 indices
-            c_ = [(i == g).sum() for g in range(groups)]  # intermediate channels
+            i = torch.linspace(0, n - 1E-6, c2).floor()  # c2 indices
+            c_ = [(i == g).sum() for g in range(n)]  # intermediate channels
         else:  # equal weight.numel() per group
-            b = [c2] + [0] * groups
-            a = np.eye(groups + 1, groups, k=-1)
+            b = [c2] + [0] * n
+            a = np.eye(n + 1, n, k=-1)
             a -= np.roll(a, 1, axis=1)
             a *= np.array(k) ** 2
             a[0] = 1
             c_ = np.linalg.lstsq(a, b, rcond=None)[0].round()  # solve for equal weight indices, ax = b
 
-        self.m = nn.ModuleList([nn.Conv2d(c1, int(c_[g]), k[g], s, k[g] // 2, bias=False) for g in range(groups)])
+        self.m = nn.ModuleList(
+            [nn.Conv2d(c1, int(c_), k, s, k // 2, groups=math.gcd(c1, int(c_)), bias=False) for k, c_ in zip(k, c_)])
         self.bn = nn.BatchNorm2d(c2)
-        self.act = nn.LeakyReLU(0.1, inplace=True)
+        self.act = nn.SiLU()
 
     def forward(self, x):
-        return x + self.act(self.bn(torch.cat([m(x) for m in self.m], 1)))
+        return self.act(self.bn(torch.cat([m(x) for m in self.m], 1)))
 
 
 class Ensemble(nn.ModuleList):
-    """一个融合模型列表，保存多个模型, 最后将所有模型的预测拼接到一起"""
     # Ensemble of models
     def __init__(self):
         super().__init__()
@@ -111,39 +83,37 @@ class Ensemble(nn.ModuleList):
             y.append(module(x, augment, profile, visualize)[0])
         # y = torch.stack(y).max(0)[0]  # max ensemble
         # y = torch.stack(y).mean(0)  # mean ensemble
-        # 在第1维度拼接，也就是num_boxes的维度
         y = torch.cat(y, 1)  # nms ensemble
         return y, None  # inference, train output
 
 
-def attempt_load(weights, map_location=None, inplace=True):
-    """加载pt文件
-    weights可以是权重路径，也可以是一个保存多个权重路径的列表
-    """
-    from yolov5_master.models.yolo import Detect, Model
+def attempt_load(weights, map_location=None, inplace=True, fuse=True):
+    from models.yolo import Detect, Model
 
     # Loads an ensemble of models weights=[a,b,c] or a single model weights=[a] or weights=a
-    # 初始化一个融合模型列表
     model = Ensemble()
     for w in weights if isinstance(weights, list) else [weights]:
-        # 加载权重文件
         ckpt = torch.load(attempt_download(w), map_location=map_location)  # load
-        model.append(ckpt['ema' if ckpt.get('ema') else 'model'].float().fuse().eval())  # FP32 model
+        if fuse:
+            model.append(ckpt['ema' if ckpt.get('ema') else 'model'].float().fuse().eval())  # FP32 model
+        else:
+            model.append(ckpt['ema' if ckpt.get('ema') else 'model'].float().eval())  # without layer fuse
 
     # Compatibility updates
     for m in model.modules():
         if type(m) in [nn.Hardswish, nn.LeakyReLU, nn.ReLU, nn.ReLU6, nn.SiLU, Detect, Model]:
             m.inplace = inplace  # pytorch 1.7.0 compatibility
+            if type(m) is Detect:
+                if not isinstance(m.anchor_grid, list):  # new Detect Layer compatibility
+                    delattr(m, 'anchor_grid')
+                    setattr(m, 'anchor_grid', [torch.zeros(1)] * m.nl)
         elif type(m) is Conv:
             m._non_persistent_buffers_set = set()  # pytorch 1.6.0 compatibility
 
-    # 如果只有一个模型，则直接返回该模型
     if len(model) == 1:
         return model[-1]  # return model
-    # 否则融合多个模型
     else:
         print(f'Ensemble created with {weights}\n')
-        # 更新融合模型的类别名属性, 步长属性
         for k in ['names']:
             setattr(model, k, getattr(model[-1], k))
         model.stride = model[torch.argmax(torch.tensor([m.stride.max() for m in model])).int()].stride  # max stride

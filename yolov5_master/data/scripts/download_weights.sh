@@ -1,5 +1,5 @@
 #!/bin/bash
-# YOLOv5 🚀 by Ultralytics https://ultralytics.com, licensed under GNU GPL v3.0
+# YOLOv5 🚀 by Ultralytics, GPL-3.0 license
 # Download latest models from https://github.com/ultralytics/yolov5/releases
 # Example usage: bash path/to/download_weights.sh
 # parent
@@ -9,9 +9,12 @@
 #     └── ...
 
 python - <<EOF
-from utils.google_utils import attempt_download
+from utils.downloads import attempt_download
 
-for x in ['s', 'm', 'l', 'x']:
+models = ['n', 's', 'm', 'l', 'x']
+models.extend([x + '6' for x in models])  # add P6 models
+
+for x in models:
     attempt_download(f'yolov5{x}.pt')
 
 EOF
