@@ -20,22 +20,25 @@ import xml.etree.cElementTree as et
 from collections import OrderedDict
 import yaml
 
-from kmeans import kmeans, avg_iou
+from yolov5_master.VOCData.kmeans import kmeans, avg_iou
 
 # 需要修改的参数：
 # 1.数据集的划分
+
+
 TRAINVAL_PENCENT = 1.0  # 训练集与验证集所占全体比例。 这里没有划分测试集所以前者1.0
 TRAIN_PERCENT = 0.9  # 训练集所占的比例，可自己进行调整
-IMG_PATH = "/home/hxzh/视频/YOLOV5/VOCData/"  # 【这里要改成数据集的绝对地址】，记的后面要加个/！！
+IMG_PATH = "/media/hxzh02/SB@home/hxzh/Dataset/VOCdevkit/VOC2007"  # 【这里要改成数据集的绝对地址】，记的后面要加个/！！
 # 2.【类别参数的设置】：（这里输入对应检测类别，取决于label名字，多个加逗号）
-CLASS_NAMES = ["person"]
-CLASS_NUM = 1
+CLASS_NAMES = ["person", "car"]
+CLASS_NUM = 2
 
 # 需要注意的参数：【无需修改但是可以知道】
-ANNOTATION_PATH = XML_LOCATION = './Annotations'  # 存放数据集标签的地址
-TXT_LOCATION = './ImageSets/Main'  # 输出数据集划分后位置的地址
+XML_LOCATION = IMG_PATH + '/Annotations'  # 存放数据集标签的地址
+ANNOTATION_PATH = IMG_PATH + '/Annotations'
+TXT_LOCATION = IMG_PATH + '/ImageSets/Main'  # 输出数据集划分后位置的地址
 # 1.聚类结果地址：
-ANCHORS_TXT_PATH = "./anchors.txt"  # anchors文件保存位置
+ANCHORS_TXT_PATH = IMG_PATH + "/anchors.txt"  # anchors文件保存位置
 # 2.选取模型配置：
 MODELCONFIG = '../models/yolov5s.yaml'
 # 3.数据配置：
@@ -109,8 +112,8 @@ def xml_yolotxt(classes_=CLASS_NAMES):
         return x, y, w, h
 
     def convert_annotation(image_id):
-        in_file = open('Annotations/%s.xml' % (image_id), encoding='UTF-8')
-        out_file = open('labels/%s.txt' % (image_id), 'w')
+        in_file = open(IMG_PATH+'/Annotations/%s.xml' % (image_id), encoding='UTF-8')
+        out_file = open(IMG_PATH+'/labels/%s.txt' % (image_id), 'w')
         tree = ET.parse(in_file)
         root = tree.getroot()
         size = root.find('size')
@@ -140,12 +143,12 @@ def xml_yolotxt(classes_=CLASS_NAMES):
     for image_set in sets:
         if not os.path.exists('labels/'):
             os.makedirs('labels/')
-        image_ids = open('ImageSets/Main/%s.txt' % (image_set)).read().strip().split()
+        image_ids = open(IMG_PATH+'/ImageSets/Main/%s.txt' % (image_set)).read().strip().split()
 
-        if not os.path.exists('dataSet_path/'):
-            os.makedirs('dataSet_path/')
+        if not os.path.exists(IMG_PATH +'/dataSet_path/'):
+            os.makedirs(IMG_PATH +'/dataSet_path/')
 
-        list_file = open('dataSet_path/%s.txt' % (image_set), 'w')
+        list_file = open(IMG_PATH +'/dataSet_path/%s.txt' % (image_set), 'w')
         for image_id in image_ids:
             list_file.write(IMG_PATH + '/images/%s.jpg\n' % (image_id))
             convert_annotation(image_id)
@@ -225,7 +228,7 @@ def calculate_anchors(anchors_tet_path=ANCHORS_TXT_PATH, annotation_path=ANNOTAT
 # 结束：转换anchor为整数类型。
 def anchor_changes_int():
     list_ = []
-    with open("./anchors.txt") as f2:
+    with open(IMG_PATH + "/anchors.txt") as f2:
         lines = f2.readlines()
     for line in lines:
         list_.append(line)
@@ -293,8 +296,10 @@ def yaml_load_dump_model(yaml_file_path=MODELCONFIG, class_num_=CLASS_NUM):
 
 def yaml_load_dump_data(yaml_file_path=DATACONFIG, class_num_=CLASS_NUM):
     kv_conf_tmpl = ordered_yaml_load(yaml_file_path)
-    kv_conf_tmpl["train"] = IMG_PATH + "dataSet_path/train.txt"
-    kv_conf_tmpl["val"] = IMG_PATH + "dataSet_path/val.txt"
+    train_txt = str(IMG_PATH + "/dataSet_path/train.txt")
+    val_txt = str(IMG_PATH + "/dataSet_path/val.txt")
+    kv_conf_tmpl["train"] = train_txt
+    kv_conf_tmpl["val"] = val_txt
     kv_conf_tmpl["nc"] = class_num_
     kv_conf_tmpl["names"] = CLASS_NAMES
     ordered_yaml_dump(kv_conf_tmpl, yaml_file_path)

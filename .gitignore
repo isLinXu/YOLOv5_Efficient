@@ -128,3 +128,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/yolov5_master/wandb/
