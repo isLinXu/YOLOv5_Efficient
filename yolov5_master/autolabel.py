@@ -14,8 +14,9 @@ from xml.etree import ElementTree as ET
 # from yolov5_master.detect import detect_parse_opt
 from yolov5_master.models.experimental import attempt_load
 from yolov5_master.utils import torch_utils
+from yolov5_master.utils.augmentations import letterbox
 from yolov5_master.utils.datasets import *
-from yolov5_master.utils.general import non_max_suppression, scale_coords, xyxy2xywh
+from yolov5_master.utils.general import non_max_suppression, scale_coords, xyxy2xywh, check_requirements
 from yolov5_master.utils.plots import plot_one_box, colors, plot_one_box_circle
 from yolov5_master.utils.torch_utils import load_classifier
 
