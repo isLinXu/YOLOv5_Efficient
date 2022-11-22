@@ -1,4 +1,8 @@
 # Yolov5_Efficient
+
+[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fatrox%2Fsync-dotenv%2Fbadge&style=flat)](https://github.com/isLinXu/Yolov5_Efficient) ![img](https://badgen.net/badge/icon/vison?icon=awesome&label) ![img](https://badgen.net/badge/icon/learning?icon=deepscan&label)![](https://img.shields.io/badge/-Seminar-blue)
+![](https://badgen.net/github/stars/isLinXu/Yolov5_Efficient)![](https://badgen.net/github/forks/isLinXu/Yolov5_Efficient)![](https://badgen.net/github/prs/isLinXu/Yolov5_Efficient)![](https://badgen.net/github/releases/isLinXu/Yolov5_Efficient)![](https://badgen.net/github/license/isLinXu/Yolov5_Efficient)![img](https://hits.dwyl.com/isLinXu/Yolov5_Efficient.svg)
+
 ![](https://img2020.cnblogs.com/blog/1571518/202111/1571518-20211105103947692-337341194.png)
 
 Use yolov5 efficiently(高效地使用Yolo v5)
